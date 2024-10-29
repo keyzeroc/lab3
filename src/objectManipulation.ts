@@ -1,30 +1,41 @@
-const pickKeys = (obj: any, keys: string[]) => {
-  const newObj: any = {};
+
+type TPickKeysReturn<T, K extends keyof T> = Pick<T, K>
+
+const pickKeys = <T extends object, K extends keyof T>(obj: T, keys: K[]): TPickKeysReturn<T, K> => {
+  const result = {} as TPickKeysReturn<T, K>
   keys.forEach((key) => {
-    if (obj.hasOwnProperty(key)) {
-      newObj[key] = obj[key];
+    if (key in obj) {
+      result[key] = obj[key]
     }
-  });
-  return newObj;
+  })
+  return result
 };
 
-const omitKeys = (obj: any, keys: string[]) => {
-  const newObj: any = {};
-  Object.keys(obj).forEach((key) => {
-    if (!keys.includes(key)) {
-      newObj[key] = obj[key];
-    }
+
+type TOmitKeysReturn<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+const omitKeys = <T extends object, K extends keyof T>(
+  obj: T,
+  keys: K[]
+): TOmitKeysReturn<T, K> => {
+  const result = { ...obj };
+  keys.forEach((key) => {
+    delete result[key];
   });
-  return newObj;
+  return result;
 };
 
-const pickChangedFields = (oldObj: any, obj:any) => {
-  const newObj: any = {};
-  Object.keys(obj).forEach((key) => {
+
+type TPickChangedFieldsReturn<T> = Partial<T>;
+
+const pickChangedFields = <T extends Record<string, any>>(oldObj: T, obj: T): TPickChangedFieldsReturn<T> => {
+  const newObj: TPickChangedFieldsReturn<T> = {};
+  let key: keyof T;
+  for (key in obj) {
     if (obj[key] !== oldObj[key]) {
       newObj[key] = obj[key];
     }
-  });
+  }
   return newObj;
 };
 
